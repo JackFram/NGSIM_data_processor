@@ -28,54 +28,78 @@ class NGSIMTrajdata:
         print("Finish data set initialization!")
         self.nframes = max(self.frame2cars.keys())
 
-    def carsinframe(self, frame: int):
-        return self.frame2cars[frame]
 
-    def carid_set(self):
-        return set(self.car2start.keys())
+def carsinframe(trajdata: NGSIMTrajdata, frame: int):
+    return trajdata.frame2cars[frame]
 
-    def nth_carid(self, frame: int, n: int):
-        return self.frame2cars[frame][n-1]
 
-    def first_carid(self, frame: int):
-        return self.nth_carid(frame, 1)
+def carid_set(trajdata: NGSIMTrajdata):
+    return set(trajdata.car2start.keys())
 
-    def iscarinframe(self, carid: int, frame: int):
-        return carid in self.carsinframe(frame)
+
+def nth_carid(trajdata: NGSIMTrajdata, frame: int, n: int):
+    return trajdata.frame2cars[frame][n-1]
+
+
+def first_carid(trajdata: NGSIMTrajdata, frame: int):
+    return nth_carid(trajdata, frame, 1)
+
+
+def iscarinframe(trajdata: NGSIMTrajdata, carid: int, frame: int):
+    return carid in carsinframe(trajdata, frame)
 
     # given frame and carid, find index of car in trajdata
     # Returns 0 if it does not exist
-    def car_df_index(self, carid: int, frame: int):
-        df = self.df
-        lo = self.car2start[carid]
-        framestart = df.loc[lo, 'frame']
 
-        retval = 0
 
-        if framestart == frame:
-            retval = lo
-        elif frame >= framestart:
-            retval = frame - framestart + lo
-            n_frames = df.loc[lo, 'n_frames_in_dataset']
-            if retval > lo + n_frames:
-                retval = 0
+def car_df_index(trajdata: NGSIMTrajdata, carid: int, frame: int):
+    df = trajdata.df
+    lo = trajdata.car2start[carid]
+    framestart = df.loc[lo, 'frame']
 
-        return retval
+    retval = 0
 
-    def get_frame_range(self, carid: int):
-        lo = self.car2start[carid]
-        framestart = self.df.loc[lo, 'frame']
+    if framestart == frame:
+        retval = lo
+    elif frame >= framestart:
+        retval = frame - framestart + lo
+        n_frames = df.loc[lo, 'n_frames_in_dataset']
+        if retval > lo + n_frames:
+            retval = 0
 
-        n_frames = self.df.loc[lo, 'n_frames_in_dataset']
-        frameend = framestart + n_frames  # in julia there us a -1 but since python's range doesn't include end index
-        return range(framestart, frameend)
+    return retval
 
-    def pull_vehicle_headings(self, v_cutoff: float = 2.5, smoothing_width: float = 0.5):
-        df = self.df
 
-        for carid in self.carid_set():
-            frames = [i for i in self.get_frame_range(carid)]
-            states =
+def get_frame_range(trajdata: NGSIMTrajdata, carid: int):
+    lo = trajdata.car2start[carid]
+    framestart = trajdata.df.loc[lo, 'frame']
+
+    n_frames = trajdata.df.loc[lo, 'n_frames_in_dataset']
+    frameend = framestart + n_frames  # in julia there us a -1 but since python's range doesn't include end index
+    return range(framestart, frameend)
+
+
+def pull_vehicle_headings(trajdata: NGSIMTrajdata, v_cutoff: float = 2.5, smoothing_width: float = 0.5):
+    df = trajdata.df
+
+    for carid in carid_set(trajdata):
+        frames = [i for i in get_frame_range(trajdata, carid)]
+
+
+dirname, filename = os.path.split(os.path.abspath(__file__))
+
+NGSIM_TRAJDATA_PATHS = [
+                        os.path.join(dirname, "../data/i101_trajectories-0750am-0805am.txt"),
+                        os.path.join(dirname, "../data/i101_trajectories-0805am-0820am.txt"),
+                        os.path.join(dirname, "../data/i101_trajectories-0820am-0835am.txt"),
+                        os.path.join(dirname, "../data/i80_trajectories-0400-0415.txt"),
+                        os.path.join(dirname, "../data/i80_trajectories-0500-0515.txt"),
+                        os.path.join(dirname, "../data/i80_trajectories-0515-0530.txt"),
+                       ]
+
+
+def load_ngsim_trajdata(i: int):
+    return NGSIMTrajdata(NGSIM_TRAJDATA_PATHS[i])
 
 
 
