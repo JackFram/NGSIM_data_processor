@@ -15,6 +15,9 @@ class VecE2:
     def atan(self):
         return math.atan(self.y/self.x)
 
+    def hypot(self):
+        return math.hypot(self.x, self.y)
+
     def rot180(self):
         return VecE2(-self.x, -self.y)
 
@@ -23,6 +26,9 @@ class VecE2:
 
     def rotr90(self):
         return VecE2(self.y, -self.x)
+
+    def __sub__(self, other):
+        return VecE2(self.x - other.x, self.y - other.y)
 
 
 def polar(r, theta):
