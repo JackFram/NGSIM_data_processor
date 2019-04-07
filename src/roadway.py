@@ -197,6 +197,6 @@ def write_roadways_to_dxf():
     # open(io->write(io, roadway_80), os.path.join(DIR, "../data/ngsim_80.txt"), "w")
     # open(io->write(io, roadway_101), os.path.join(DIR, "../data/ngsim_101.txt"), "w")
 
-# const ROADWAY_80 = open(io->read(io, MIME"text/plain"(), Roadway), os.path.join(DIR, "../data/ngsim_80.txt"), "r")
-# const ROADWAY_101 = open(io->read(io, MIME"text/plain"(), Roadway), os.path.join(DIR, "../data/ngsim_101.txt"), "r")
+ROADWAY_80 = open(io->read(io, MIME"text/plain"(), Roadway), os.path.join(DIR, "../data/ngsim_80.txt"), "r")
+ROADWAY_101 = open(io->read(io, MIME"text/plain"(), Roadway), os.path.join(DIR, "../data/ngsim_101.txt"), "r")
 

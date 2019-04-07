@@ -98,8 +98,8 @@ NGSIM_TRAJDATA_PATHS = [
                        ]
 
 
-def load_ngsim_trajdata(i: int):
-    return NGSIMTrajdata(NGSIM_TRAJDATA_PATHS[i])
+def load_ngsim_trajdata(filepath: str):
+    return NGSIMTrajdata(filepath)
 
 
 

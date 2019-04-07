@@ -2,7 +2,18 @@
 # NGSIM dataset processor trajdata.py file
 
 import math
+import os
 from src import ngsim_trajdata
+from src import trajectory_smoothing
+from Vec import VecSE2
+from src import roadway
+
+
+
+NGSIM_TIMESTEP = 0.1 # [sec]
+SMOOTHING_WIDTH_POS = 0.5 # [s]
+METERS_PER_FOOT = roadway.METERS_PER_FOOT
+DIR, filename = os.path.split(os.path.abspath(__file__))
 
 
 def symmetric_exponential_moving_average(arr: list, T: float, dt: float = 0.1):
@@ -53,6 +64,151 @@ class FilterTrajectoryResult:
 
     def __len__(self):
         return len(self.x_arr)
+
+
+def filter_trajectory(ftr: FilterTrajectoryResult, v: trajectory_smoothing.VehicleSystem = trajectory_smoothing.VehicleSystem()):
+
+    mu = [ftr.x_arr[0], ftr.y_arr[0], ftr.theta_arr[0], ftr.v_arr[0]]
+    sigma = 1e-1
+    cov_ = Matrix(Diagonal([sigma * 0.01, sigma * 0.01, sigma * 0.1, sigma]))
+
+    # assume control is centered
+    u = [0.0, 0.0]
+    z = [None, None]
+
+    for i in range(1, len(ftr)):
+
+        # pull observation
+        z[0] = ftr.x_arr[i]
+        z[1] = ftr.y_arr[i]
+
+        # apply extended Kalman filter
+        mu, cov_ = EKF(v, mu, cov_, u, z)
+
+        # strong result
+        ftr.x_arr[i] = mu[0]
+        ftr.y_arr[i] = mu[1]
+        ftr.theta_arr[i] = mu[2]
+        ftr.v_arr[i] = mu[3]
+
+    return ftr
+
+
+def copy(trajdata: ngsim_trajdata.NGSIMTrajdata, ftr: FilterTrajectoryResult):
+    dfstart = trajdata.car2start[ftr.carid]
+    N = trajdata.df.loc[dfstart, 'n_frames_in_dataset']
+
+    # copy results back to trajdata
+
+    for i in range(N):
+        trajdata.df.loc[dfstart + i, 'global_x'] = ftr.x_arr[i]
+        trajdata.df.loc[dfstart + i, 'global_y'] = ftr.y_arr[i]
+        # trajdata.df[dfstart + i, 'speed'] = ftr.v_arr[i]
+        if i > 0:
+            trajdata.df[dfstart + i, 'speed'] = math.hypot(ftr.x_arr[i] - ftr.x_arr[i-1],
+                                                           ftr.y_arr[i] - ftr.y_arr[i-1]) / NGSIM_TIMESTEP
+        else:
+            trajdata.df[dfstart + i, 'speed'] = math.hypot(ftr.x_arr[i + 1] - ftr.x_arr[i],
+                                                           ftr.y_arr[i + 1] - ftr.y_arr[i]) / NGSIM_TIMESTEP
+        trajdata.df[dfstart + i, 'global_heading'] = ftr.theta_arr[i]
+
+    return trajdata
+
+
+def filter_given_trajectory(trajdata: ngsim_trajdata.NGSIMTrajdata, carid: int):
+    # Filters the given vehicle's trajectory using an Extended Kalman Filter
+
+    ftr = FilterTrajectoryResult(trajdata, carid)
+
+    # run pre-smoothing
+    ftr.x_arr = symmetric_exponential_moving_average(ftr.x_arr, SMOOTHING_WIDTH_POS)
+    ftr.y_arr = symmetric_exponential_moving_average(ftr.y_arr, SMOOTHING_WIDTH_POS)
+
+    ftr = filter_trajectory(ftr)
+
+    trajdata = copy(trajdata, ftr)
+
+    return trajdata
+
+
+def load_ngsim_trajdata(filepath: str, autofilter: bool = True):
+    print("loading from file: ")
+    tdraw = ngsim_trajdata.NGSIMTrajdata(filepath)
+
+    if autofilter and os.path.splitext(filepath)[1] == ".txt":
+        print("filtering:         ")
+        for carid in ngsim_trajdata.carid_set(tdraw):
+            tdraw = filter_given_trajectory(tdraw, carid)
+
+    return tdraw
+
+
+def convert(tdraw: ngsim_trajdata.NGSIMTrajdata, roadway: Roadway):
+    df = tdraw.df
+    vehdefs = {}
+    states = []
+    frames = []
+
+    for id, dfind in tdraw.car2start:
+        vehdefs[id] = VehicleDef(df.loc[dfind, 'class'],
+                                 df.loc[dfind, 'length']*METERS_PER_FOOT,
+                                 df.loc[dfind, 'width'] * METERS_PER_FOOT)
+
+    state_ind = 0
+    for frame in range(tdraw.nframes):
+
+        frame_lo = state_ind + 1
+
+        for id in ngsim_trajdata.carsinframe(tdraw, frame):
+            dfind = ngsim_trajdata.car_df_index(tdraw, id, frame)
+
+            posG = VecSE2.VecSE2(df.loc[dfind, 'global_x'] * METERS_PER_FOOT,
+                                 df.loc[dfind, 'global_y'] * METERS_PER_FOOT,
+                                 df.loc[dfind, 'global_heading'])
+            speed = df.loc[dfind, 'speed'] * METERS_PER_FOOT
+            state_ind += 1
+            states[state_ind] = RecordState(VehicleState(posG, roadway, speed), id)
+
+        frame_hi = state_ind
+        frames[frame] = RecordFrame(frame_lo, frame_hi)
+
+    return Trajdata(NGSIM_TIMESTEP, frames, states, vehdefs)
+
+
+def get_corresponding_roadway(filename: str):
+    if "i101" in filename:
+        return roadway.ROADWAY_101
+    else:
+        return roadway.ROADWAY_80
+
+
+def convert_raw_ngsim_to_trajdatas():
+    for filepath in ngsim_trajdata.NGSIM_TRAJDATA_PATHS:
+        filename = os.path.split(filepath)[1]
+        print("converting " + filename)
+
+        roadway = get_corresponding_roadway(filename)
+        tdraw = ngsim_trajdata.load_ngsim_trajdata(filepath)
+        trajdata = convert(tdraw, roadway)
+        outpath = os.path.join(DIR, "../data/trajdata_" + filename)
+        open(io->write(io, MIME"text/plain"(), trajdata), outpath, "w")
+
+
+
+TRAJDATA_PATHS = [os.path.join( DIR, "../data/trajdata_i101_trajectories-0750am-0805am.txt"),
+                os.path.join( DIR, "../data/trajdata_i101_trajectories-0805am-0820am.txt"),
+                os.path.join( DIR, "../data/trajdata_i101_trajectories-0820am-0835am.txt"),
+                os.path.join( DIR, "../data/trajdata_i80_trajectories-0400-0415.txt"),
+                os.path.join( DIR, "../data/trajdata_i80_trajectories-0500-0515.txt"),
+                os.path.join( DIR, "../data/trajdata_i80_trajectories-0515-0530.txt")]
+
+
+def load_trajdata(filepath: str):
+    td = open(io->read(io, MIME"text/plain"(), Trajdata), filepath, "r")
+    return td
+
+
+
 
 
 
