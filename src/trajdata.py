@@ -6,14 +6,14 @@ import os
 from src import ngsim_trajdata
 from src import trajectory_smoothing
 from Vec import VecSE2
-from src import roadway
+from src import const
 
 
 
-NGSIM_TIMESTEP = 0.1 # [sec]
-SMOOTHING_WIDTH_POS = 0.5 # [s]
-METERS_PER_FOOT = roadway.METERS_PER_FOOT
-DIR, filename = os.path.split(os.path.abspath(__file__))
+NGSIM_TIMESTEP = const.NGSIM_TIMESTEP
+SMOOTHING_WIDTH_POS = const.SMOOTHING_WIDTH_POS # [s]
+METERS_PER_FOOT = const.METERS_PER_FOOT
+DIR = const.DIR
 
 
 def symmetric_exponential_moving_average(arr: list, T: float, dt: float = 0.1):
@@ -177,9 +177,9 @@ def convert(tdraw: ngsim_trajdata.NGSIMTrajdata, roadway: Roadway):
 
 def get_corresponding_roadway(filename: str):
     if "i101" in filename:
-        return roadway.ROADWAY_101
+        return const.ROADWAY_101
     else:
-        return roadway.ROADWAY_80
+        return const.ROADWAY_80
 
 
 def convert_raw_ngsim_to_trajdatas():
@@ -192,15 +192,6 @@ def convert_raw_ngsim_to_trajdatas():
         trajdata = convert(tdraw, roadway)
         outpath = os.path.join(DIR, "../data/trajdata_" + filename)
         open(io->write(io, MIME"text/plain"(), trajdata), outpath, "w")
-
-
-
-TRAJDATA_PATHS = [os.path.join( DIR, "../data/trajdata_i101_trajectories-0750am-0805am.txt"),
-                os.path.join( DIR, "../data/trajdata_i101_trajectories-0805am-0820am.txt"),
-                os.path.join( DIR, "../data/trajdata_i101_trajectories-0820am-0835am.txt"),
-                os.path.join( DIR, "../data/trajdata_i80_trajectories-0400-0415.txt"),
-                os.path.join( DIR, "../data/trajdata_i80_trajectories-0500-0515.txt"),
-                os.path.join( DIR, "../data/trajdata_i80_trajectories-0515-0530.txt")]
 
 
 def load_trajdata(filepath: str):

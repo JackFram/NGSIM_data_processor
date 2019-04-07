@@ -86,18 +86,6 @@ def pull_vehicle_headings(trajdata: NGSIMTrajdata, v_cutoff: float = 2.5, smooth
         frames = [i for i in get_frame_range(trajdata, carid)]
 
 
-dirname, filename = os.path.split(os.path.abspath(__file__))
-
-NGSIM_TRAJDATA_PATHS = [
-                        os.path.join(dirname, "../data/i101_trajectories-0750am-0805am.txt"),
-                        os.path.join(dirname, "../data/i101_trajectories-0805am-0820am.txt"),
-                        os.path.join(dirname, "../data/i101_trajectories-0820am-0835am.txt"),
-                        os.path.join(dirname, "../data/i80_trajectories-0400-0415.txt"),
-                        os.path.join(dirname, "../data/i80_trajectories-0500-0515.txt"),
-                        os.path.join(dirname, "../data/i80_trajectories-0515-0530.txt"),
-                       ]
-
-
 def load_ngsim_trajdata(filepath: str):
     return NGSIMTrajdata(filepath)
 
