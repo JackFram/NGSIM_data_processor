@@ -15,3 +15,17 @@ class CurvePt:
 
 def lerp(a: CurvePt, b: CurvePt, t: float):
     return CurvePt(VecSE2.lerp(a.pos, b.pos, t), a.s + (b.s - a.s)*t, a.k + (b.k - a.k)*t, a.kd + (b.kd - a.kd)*t)
+
+
+class CurveIndex:
+    def __init__(self, i: int, t: float):
+        self.i = i
+        self.t = t
+
+
+def curveindex_end(curve: list):
+    return CurveIndex(len(curve)-1, 1.0)
+
+
+CURVEINDEX_START = CurveIndex(1, 0.0)
+

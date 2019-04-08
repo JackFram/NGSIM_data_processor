@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="29f4b3ba-4976-48d8-baa4-b4eaab2a674e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ngsim_trajdata.py" afterPath="$PROJECT_DIR$/src/ngsim_trajdata.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/trajdata.py" afterPath="$PROJECT_DIR$/src/trajdata.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/curves/CurvePt.py" afterPath="$PROJECT_DIR$/curves/CurvePt.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/trajectory_smoothing.py" afterPath="$PROJECT_DIR$/src/trajectory_smoothing.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,7 +17,7 @@
       <file leaf-file-name="roadway.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/roadway.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1848">
+            <state relative-caret-position="2272">
               <caret line="172" column="9" lean-forward="true" selection-start-line="172" selection-start-column="9" selection-end-line="172" selection-end-column="9" />
               <folding>
                 <element signature="e#56#65#0" expanded="true" />
@@ -30,7 +29,7 @@
       <file leaf-file-name="trajdata.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/trajdata.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-404">
+            <state relative-caret-position="98">
               <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
               <folding>
                 <element signature="e#59#70#0" expanded="true" />
@@ -39,7 +38,39 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="const.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Roadway/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="roadway.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Roadway/roadway.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="530">
+              <caret line="151" column="0" lean-forward="true" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
+              <folding>
+                <element signature="e#41#67#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CurvePt.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/curves/CurvePt.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="300">
+              <caret line="20" column="41" lean-forward="true" selection-start-line="20" selection-start-column="41" selection-end-line="20" selection-end-column="41" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="const.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/const.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="225">
@@ -52,8 +83,8 @@
       <file leaf-file-name="trajectory_smoothing.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/trajectory_smoothing.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="34" lean-forward="true" selection-start-line="8" selection-start-column="34" selection-end-line="8" selection-end-column="34" />
+            <state relative-caret-position="560">
+              <caret line="189" column="30" lean-forward="false" selection-start-line="189" selection-start-column="30" selection-end-line="189" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -71,21 +102,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CurvePt.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/curves/CurvePt.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="VecE2.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Vec/VecE2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-325">
-              <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="1" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -97,18 +118,6 @@
             <state relative-caret-position="225">
               <caret line="15" column="41" lean-forward="false" selection-start-line="15" selection-start-column="41" selection-end-line="15" selection-end-column="41" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VecSE2.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Vec/VecSE2.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="48" lean-forward="false" selection-start-line="9" selection-start-column="48" selection-end-line="9" selection-end-column="48" />
-              <folding>
-                <element signature="e#40#51#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -150,12 +159,14 @@
         <option value="$PROJECT_DIR$/curves/__init__.py" />
         <option value="$PROJECT_DIR$/Vec/VecE2.py" />
         <option value="$PROJECT_DIR$/Vec/VecSE2.py" />
-        <option value="$PROJECT_DIR$/curves/CurvePt.py" />
-        <option value="$PROJECT_DIR$/src/trajectory_smoothing.py" />
         <option value="$PROJECT_DIR$/src/roadway.py" />
         <option value="$PROJECT_DIR$/src/const.py" />
         <option value="$PROJECT_DIR$/src/ngsim_trajdata.py" />
         <option value="$PROJECT_DIR$/src/trajdata.py" />
+        <option value="$PROJECT_DIR$/src/trajectory_smoothing.py" />
+        <option value="$PROJECT_DIR$/Roadway/__init__.py" />
+        <option value="$PROJECT_DIR$/curves/CurvePt.py" />
+        <option value="$PROJECT_DIR$/Roadway/roadway.py" />
       </list>
     </option>
   </component>
@@ -197,7 +208,22 @@
             <path>
               <item name="NGSIM_data_processor" type="b2602c69:ProjectViewProjectNode" />
               <item name="NGSIM_data_processor" type="462c0819:PsiDirectoryNode" />
+              <item name="curves" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="NGSIM_data_processor" type="b2602c69:ProjectViewProjectNode" />
+              <item name="NGSIM_data_processor" type="462c0819:PsiDirectoryNode" />
+              <item name="Roadway" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="NGSIM_data_processor" type="b2602c69:ProjectViewProjectNode" />
+              <item name="NGSIM_data_processor" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="NGSIM_data_processor" type="b2602c69:ProjectViewProjectNode" />
+              <item name="NGSIM_data_processor" type="462c0819:PsiDirectoryNode" />
+              <item name="Vec" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -288,7 +314,9 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="1" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
@@ -370,28 +398,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/curves/CurvePt.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Vec/VecE2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-325">
-          <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Vec/VecSE2.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="9" column="48" lean-forward="false" selection-start-line="9" selection-start-column="48" selection-end-line="9" selection-end-column="48" />
           <folding>
-            <element signature="e#40#51#0" expanded="true" />
+            <element signature="e#40#51#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -411,17 +423,25 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/const.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="58" lean-forward="false" selection-start-line="15" selection-start-column="58" selection-end-line="15" selection-end-column="58" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/trajectory_smoothing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="34" lean-forward="true" selection-start-line="8" selection-start-column="34" selection-end-line="8" selection-end-column="34" />
+        <state relative-caret-position="560">
+          <caret line="189" column="30" lean-forward="false" selection-start-line="189" selection-start-column="30" selection-end-line="189" selection-end-column="30" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/trajdata.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-404">
+        <state relative-caret-position="98">
           <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
           <folding>
             <element signature="e#59#70#0" expanded="true" />
@@ -429,13 +449,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/roadway.py">
+    <entry file="file://$PROJECT_DIR$/Roadway/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1848">
-          <caret line="172" column="9" lean-forward="true" selection-start-line="172" selection-start-column="9" selection-end-line="172" selection-end-column="9" />
-          <folding>
-            <element signature="e#56#65#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Vec/VecE2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="1" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/curves/CurvePt.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="20" column="41" lean-forward="true" selection-start-line="20" selection-start-column="41" selection-end-line="20" selection-end-column="41" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -449,11 +483,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/const.py">
+    <entry file="file://$PROJECT_DIR$/src/roadway.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="58" lean-forward="false" selection-start-line="15" selection-start-column="58" selection-end-line="15" selection-end-column="58" />
-          <folding />
+        <state relative-caret-position="2272">
+          <caret line="172" column="9" lean-forward="true" selection-start-line="172" selection-start-column="9" selection-end-line="172" selection-end-column="9" />
+          <folding>
+            <element signature="e#56#65#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Roadway/roadway.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="530">
+          <caret line="151" column="0" lean-forward="true" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
+          <folding>
+            <element signature="e#41#67#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
