@@ -8,6 +8,7 @@ from src import ngsim_trajdata
 from src import trajectory_smoothing
 from Vec import VecSE2
 from src import const
+from Roadway import roadway
 
 
 
@@ -144,7 +145,7 @@ def load_ngsim_trajdata(filepath: str, autofilter: bool = True):
     return tdraw
 
 
-def convert(tdraw: ngsim_trajdata.NGSIMTrajdata, roadway: Roadway):
+def convert(tdraw: ngsim_trajdata.NGSIMTrajdata, roadway: roadway.Roadway):
     df = tdraw.df
     vehdefs = {}
     states = []
@@ -189,7 +190,7 @@ def convert_raw_ngsim_to_trajdatas():
         print("converting " + filename)
 
         roadway = get_corresponding_roadway(filename)
-        tdraw = ngsim_trajdata.load_ngsim_trajdata(filepath)
+        tdraw = load_ngsim_trajdata(filepath)
         trajdata = convert(tdraw, roadway)
         outpath = os.path.join(DIR, "../data/trajdata_" + filename)
         open(io->write(io, MIME"text/plain"(), trajdata), outpath, "w")

@@ -29,3 +29,12 @@ def curveindex_end(curve: list):
 
 CURVEINDEX_START = CurveIndex(1, 0.0)
 
+
+class CurveProjection:
+    def __init__(self, ind: CurveIndex, t: float, phi: float):
+        self.ind = ind
+        self.t = t
+        self.phi = phi
+
+
+

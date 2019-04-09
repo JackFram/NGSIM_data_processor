@@ -72,6 +72,10 @@ def rot(a: VecE2, theta: float):
     return VecE2(a.x*c - a.y*s, a.x*s+a.y*c)
 
 
+def normsquared(v: VecE2):
+    return v.x*v.x + v.y*v.y
+
+
 
 
 

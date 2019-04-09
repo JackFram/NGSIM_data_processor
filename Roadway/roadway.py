@@ -1,7 +1,7 @@
 # Zhihao Zhang
 # roadway class in python
 from curves import CurvePt
-from Vec import VecSE2
+from Vec import VecSE2, VecE2
 import math
 import re
 
@@ -25,6 +25,9 @@ class LaneTag:
     def __init__(self, segment: int, lane: int):
         self.segment = segment
         self.lane = lane
+
+
+NULL_LANETAG = LaneTag(0,0)
 
 
 class RoadIndex:
@@ -85,6 +88,16 @@ class RoadSegment:
 class Roadway:
     def __init__(self, segments: list = []):
         self.segments = segments
+
+    def get_by_tag(self, tag: LaneTag):
+        seg = self.get_by_id(tag.segment)
+        return seg.lanes[tag.lane]
+
+    def get_by_id(self, segid: int):
+        for seg in self.segments:
+            if seg.id == segid:
+                return seg
+        raise IndexError("Could not find segid {} in roadway".format(segid))
 
 
 def read_roadway(fp):
@@ -150,6 +163,34 @@ def read_roadway(fp):
                                      entrances=entrances, exits=exits))
         roadway.segments.append(seg)
     return roadway
+
+class RoadProjection:
+    def __init__(self, curveproj: CurvePt.CurveProjection, tag: LaneTag):
+        self.curveproj = curveproj
+        self.tag = tag
+
+
+def proj_1(posG: VecSE2.VecSE2, lane: Lane, roadway: Roadway, move_along_curves: bool = True):
+    return RoadProjection()
+
+
+def proj_2(posG: VecSE2.VecSE2, roadway: Roadway):
+
+    best_dist2 = math.inf
+    best_proj = RoadProjection(CurvePt.CurveProjection(CurvePt.CurveIndex(-1,-1), None, None), NULL_LANETAG)
+
+    for seg in roadway.segments:
+        for lane in seg.lanes:
+            roadproj = proj_1(posG, lane, roadway, move_along_curves=False)
+            targetlane = roadway.get_by_tag(roadproj.tag)
+            footpoint = targetlane[roadproj.curveproj.ind, roadway]  # TODO: write a get method
+            dist2 = VecE2.normsquared(VecE2.VecE2(posG - footpoint.pos))
+            if dist2 < best_dist2:
+                best_dist2 = dist2
+                best_proj = roadproj
+
+    return best_proj
+
 
 
 
