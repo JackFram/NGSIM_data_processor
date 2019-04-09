@@ -6,6 +6,7 @@ import math
 import os
 from NGSIM_data_processor.Vec import VecE2, VecSE2
 from NGSIM_data_processor.curves import CurvePt
+from Roadway import roadway
 
 FLOATING_POINT_REGEX = r'[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?'
 METERS_PER_FOOT = 0.3048
@@ -197,6 +198,6 @@ def write_roadways_to_dxf():
     # open(io->write(io, roadway_80), os.path.join(DIR, "../data/ngsim_80.txt"), "w")
     # open(io->write(io, roadway_101), os.path.join(DIR, "../data/ngsim_101.txt"), "w")
 
-ROADWAY_80 = open(io->read(io, MIME"text/plain"(), Roadway), os.path.join(DIR, "../data/ngsim_80.txt"), "r")
-ROADWAY_101 = open(io->read(io, MIME"text/plain"(), Roadway), os.path.join(DIR, "../data/ngsim_101.txt"), "r")
+ROADWAY_80 = roadway.read_roadway(open(os.path.join(DIR, "../data/ngsim_80.txt"), "r"))
+ROADWAY_101 = roadway.read_roadway(open(os.path.join(DIR, "../data/ngsim_101.txt"), "r"))
 

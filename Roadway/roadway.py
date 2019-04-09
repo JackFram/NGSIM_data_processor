@@ -89,6 +89,7 @@ class Roadway:
 
 def read_roadway(fp):
     lines = fp.readlines()
+    fp.close()
     line_index = 0
     if "ROADWAY" in lines[line_index]:
         line_index += 1

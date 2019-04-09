@@ -3,6 +3,7 @@
 
 import math
 import os
+import numpy as np
 from src import ngsim_trajdata
 from src import trajectory_smoothing
 from Vec import VecSE2
@@ -70,7 +71,7 @@ def filter_trajectory(ftr: FilterTrajectoryResult, v: trajectory_smoothing.Vehic
 
     mu = [ftr.x_arr[0], ftr.y_arr[0], ftr.theta_arr[0], ftr.v_arr[0]]
     sigma = 1e-1
-    cov_ = Matrix(Diagonal([sigma * 0.01, sigma * 0.01, sigma * 0.1, sigma]))
+    cov_ = np.diag([sigma * 0.01, sigma * 0.01, sigma * 0.1, sigma])
 
     # assume control is centered
     u = [0.0, 0.0]
@@ -83,7 +84,7 @@ def filter_trajectory(ftr: FilterTrajectoryResult, v: trajectory_smoothing.Vehic
         z[1] = ftr.y_arr[i]
 
         # apply extended Kalman filter
-        mu, cov_ = EKF(v, mu, cov_, u, z)
+        mu, cov_ = trajectory_smoothing.EKF(v, mu, cov_, u, z)
 
         # strong result
         ftr.x_arr[i] = mu[0]
