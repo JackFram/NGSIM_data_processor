@@ -1,0 +1,35 @@
+roadway[roadproj.tag]
+
+footpoint = targetlane[roadproj.curveproj.ind, roadway]
+
+
+
+function Base.getindex(lane::Lane, ind::CurveIndex, roadway::Roadway)
+    if ind.i == 0
+        pt_lo = prev_lane_point(lane, roadway)
+        pt_hi = lane.curve[1]
+        s_gap = norm(VecE2(pt_hi.pos - pt_lo.pos))
+        pt_lo = CurvePt(pt_lo.pos, -s_gap, pt_lo.k, pt_lo.kd)
+        lerp(pt_lo, pt_hi, ind.t)
+    elseif ind.i < length(lane.curve)
+        lane.curve[ind]
+    else
+        pt_hi = next_lane_point(lane, roadway)
+        pt_lo = lane.curve[end]
+        s_gap = norm(VecE2(pt_hi.pos - pt_lo.pos))
+        pt_hi = CurvePt(pt_hi.pos, pt_lo.s + s_gap, pt_hi.k, pt_hi.kd)
+        lerp( pt_lo, pt_hi, ind.t)
+    end
+end
+
+next_lane_point(lane::Lane, roadway::Roadway) = roadway[lane.exits[1].target]
+prev_lane_point(lane::Lane, roadway::Roadway) = roadway[lane.entrances[1].target]
+
+
+function Base.getindex(roadway::Roadway, roadind::RoadIndex)
+    lane = roadway[roadind.tag]
+    lane[roadind.ind, roadway]
+end
+
+
+

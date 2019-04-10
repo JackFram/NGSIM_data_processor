@@ -21,6 +21,7 @@ NULL_BOUNDARY = LaneBoundary("unknown", "unknown")
 DEFAULT_SPEED_LIMIT = SpeedLimit(-math.inf, math.inf)
 DEFAULT_LANE_WIDTH = 3.0
 
+
 class LaneTag:
     def __init__(self, segment: int, lane: int):
         self.segment = segment
@@ -78,6 +79,22 @@ class Lane:
         if prev != NULL_ROADINDEX:
             self.entrances.insert(0, LaneConnection(False, CurvePt.CURVEINDEX_START, prev))
 
+    def get_by_ind_roadway(self, ind: CurvePt.CurveIndex, roadway: Roadway):
+        if ind.i == 0:
+            pt_lo = prev_lane_point(self, roadway)
+            pt_hi = self.curve[0]
+            s_gap = norm(VecE2.VecE2(pt_hi.pos - pt_lo.pos))
+            pt_lo = CurvePt.CurvePt(pt_lo.pos, -s_gap, pt_lo.k, pt_lo.kd)
+            CurvePt.lerp(pt_lo, pt_hi, ind.t)
+        elif ind.i < len(self.curve):
+            return CurvePt.lerp(self.curve[ind.i - 1], self.curve[ind.i], ind.t)
+        else:
+            pt_hi = next_lane_point(self, roadway)
+            pt_lo = self.curve[-1]
+            s_gap = norm(VecE2.VecE2(pt_hi.pos - pt_lo.pos))
+            pt_hi = CurvePt.CurvePt(pt_hi.pos, pt_lo.s + s_gap, pt_hi.k, pt_hi.kd)
+            CurvePt.lerp(pt_lo, pt_hi, ind.t)
+
 
 class RoadSegment:
     def __init__(self, id: int, lanes: list):
@@ -98,6 +115,10 @@ class Roadway:
             if seg.id == segid:
                 return seg
         raise IndexError("Could not find segid {} in roadway".format(segid))
+
+    def get_by_roadindex(self, roadindex: RoadIndex):
+        lane = self.get_by_tag(roadindex.tag)
+        return lane.get_by_ind_roadway(roadindex.ind, self)
 
 
 def read_roadway(fp):
@@ -164,25 +185,76 @@ def read_roadway(fp):
         roadway.segments.append(seg)
     return roadway
 
+
 class RoadProjection:
     def __init__(self, curveproj: CurvePt.CurveProjection, tag: LaneTag):
         self.curveproj = curveproj
         self.tag = tag
 
 
+def next_lane(lane: Lane, roadway: Roadway):
+    return roadway.get_by_tag(lane.exits[0].target.tag)
+
+
+def prev_lane(lane: Lane, roadway: Roadway):
+    return roadway.get_by_tag(lane.entrances[1].target.tag)
+
+
+def next_lane_point(lane: Lane, roadway: Roadway):
+    return roadway.get_by_roadindex(lane.exits[0].target)
+
+
+def prev_lane_point(lane: Lane, roadway: Roadway):
+    return roadway.get_by_roadindex(lane.entrances[0].target)
+
+
 def proj_1(posG: VecSE2.VecSE2, lane: Lane, roadway: Roadway, move_along_curves: bool = True):
-    return RoadProjection()
+    curveproj = proj(posG, lane.curve)
+    rettag = lane.tag
+    if curveproj.ind == CurvePt.CurveIndex(1, 0.0) and has_prev(lane):
+        pt_lo = prev_lane_point(lane, roadway)
+        pt_hi = lane.curve[0]
+        t = get_lerp_time_unclamped(pt_lo, pt_hi, posG)
+        if t <= 0.0 and move_along_curves:
+            return proj_1(posG, prev_lane(lane, roadway), roadway)
+        elif t < 1.0:
+            assert ((not move_along_curves) or 0.0 <= t < 1.0)
+            # t was computed assuming a constant angle
+            # this is not valid for the large distances and angle disparities between lanes
+            # thus we now use a bisection search to find the appropriate location
+
+            t, footpoint = get_closest_perpendicular_point_between_points(pt_lo.pos, pt_hi.pos, posG)
+
+            ind = CurvePt.CurveIndex(0, t)
+            curveproj = get_curve_projection(posG, footpoint, ind)
+    elif curveproj.ind == curveindex_end(lane.curve) and has_next(lane):
+        pt_lo = lane.curve[-1]
+        pt_hi = next_lane_point(lane, roadway)
+        t = get_lerp_time_unclamped(pt_lo, pt_hi, posG)
+        if t >= 1.0 and move_along_curves:
+            return proj_1(posG, next_lane(lane, roadway), roadway)
+        elif t >= 0.0:
+            assert ((not move_along_curves) or 0.0 <= t < 1.0)
+            # t was computed assuming a constant angle
+            # this is not valid for the large distances and angle disparities between lanes
+            # thus we now use a bisection search to find the appropriate location
+
+            t, footpoint = get_closest_perpendicular_point_between_points(pt_lo.pos, pt_hi.pos, posG)
+
+            ind = CurvePt.CurveIndex(len(lane.curve), t)
+            curveproj = get_curve_projection(posG, footpoint, ind)
+    return RoadProjection(curveproj, rettag)
 
 
 def proj_2(posG: VecSE2.VecSE2, roadway: Roadway):
 
     best_dist2 = math.inf
-    best_proj = RoadProjection(CurvePt.CurveProjection(CurvePt.CurveIndex(-1,-1), None, None), NULL_LANETAG)
+    best_proj = RoadProjection(CurvePt.CurveProjection(CurvePt.CurveIndex(-1, -1), None, None), NULL_LANETAG)
 
     for seg in roadway.segments:
         for lane in seg.lanes:
-            roadproj = proj_1(posG, lane, roadway, move_along_curves=False)
-            targetlane = roadway.get_by_tag(roadproj.tag)
+            roadproj = proj_1(posG, lane, roadway, move_along_curves=False)  # return RoadProjection
+            targetlane = roadway.get_by_tag(roadproj.tag)  # return Lane
             footpoint = targetlane[roadproj.curveproj.ind, roadway]  # TODO: write a get method
             dist2 = VecE2.normsquared(VecE2.VecE2(posG - footpoint.pos))
             if dist2 < best_dist2:

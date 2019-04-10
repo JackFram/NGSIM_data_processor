@@ -9,6 +9,8 @@ from src import trajectory_smoothing
 from Vec import VecSE2
 from src import const
 from Roadway import roadway
+from Record import record
+from Basic import Vehicle
 
 
 
@@ -152,9 +154,9 @@ def convert(tdraw: ngsim_trajdata.NGSIMTrajdata, roadway: roadway.Roadway):
     frames = []
 
     for id, dfind in tdraw.car2start:
-        vehdefs[id] = VehicleDef(df.loc[dfind, 'class'],
-                                 df.loc[dfind, 'length']*METERS_PER_FOOT,
-                                 df.loc[dfind, 'width'] * METERS_PER_FOOT)
+        vehdefs[id] = Vehicle.VehicleDef(df.loc[dfind, 'class'],
+                                        df.loc[dfind, 'length'] * METERS_PER_FOOT,
+                                        df.loc[dfind, 'width'] * METERS_PER_FOOT)
 
     state_ind = 0
     for frame in range(tdraw.nframes):
@@ -169,12 +171,12 @@ def convert(tdraw: ngsim_trajdata.NGSIMTrajdata, roadway: roadway.Roadway):
                                  df.loc[dfind, 'global_heading'])
             speed = df.loc[dfind, 'speed'] * METERS_PER_FOOT
             state_ind += 1
-            states[state_ind] = RecordState(VehicleState(posG, roadway, speed), id)
+            states[state_ind] = record.RecordState(VehicleState(posG, roadway, speed), id)
 
         frame_hi = state_ind
-        frames[frame] = RecordFrame(frame_lo, frame_hi)
+        frames[frame] = record.RecordFrame(frame_lo, frame_hi)
 
-    return Trajdata(NGSIM_TIMESTEP, frames, states, vehdefs)
+    return record.ListRecord(NGSIM_TIMESTEP, frames, states, vehdefs)
 
 
 def get_corresponding_roadway(filename: str):
