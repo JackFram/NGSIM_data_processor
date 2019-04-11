@@ -1,3 +1,5 @@
+from Basic import Vehicle
+
 class RecordFrame:
     def __init__(self, lo: int, hi: int):
         self.lo = lo
@@ -8,7 +10,7 @@ class RecordFrame:
 
 
 class RecordState:
-    def __init__(self, state: dict, id: list):
+    def __init__(self, state: Vehicle.VehicleState, id: list):
         self.state = state  # Dict
         self.id = id  # Array
 

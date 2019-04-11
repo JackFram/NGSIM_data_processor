@@ -1,4 +1,6 @@
 from NGSIM_data_processor.Vec import VecSE2
+from Vec import VecE2
+from Vec.geom import geom
 
 
 class CurvePt:
@@ -37,19 +39,116 @@ class CurveProjection:
         self.phi = phi
 
 
+def div(a, b):
+    return int(a/b)
+
+
+def index_closest_to_point(curve: list, target: VecSE2.VecSE2):  # curve: list(CurvePt)
+
+    a = 1
+    b = len(curve)
+    c = div(a+b, 2)
+
+    assert(len(curve) >= b)
+
+    sqdist_a = VecE2.normsquared(VecE2.VecE2(curve[a].pos - target))
+    sqdist_b = VecE2.normsquared(VecE2.VecE2(curve[b].pos - target))
+    sqdist_c = VecE2.normsquared(VecE2.VecE2(curve[c].pos - target))
+
+    while True:
+        if b == a:
+            return a
+        elif b == a + 1:
+            return  b if sqdist_b < sqdist_a else a
+        elif c == a + 1 and c == b - 1:
+            if sqdist_a < sqdist_b and sqdist_a < sqdist_c:
+                return a
+            elif sqdist_b < sqdist_a and sqdist_b < sqdist_c:
+                return b
+            else:
+                return c
+
+        left = div(a+c, 2)
+        sqdist_l = VecE2.normsquared(VecE2.VecE2(curve[left].pos - target))
+
+        right = div(c+b, 2)
+        sqdist_r = VecE2.normsquared(VecE2.VecE2(curve[right].pos - target))
+
+        if sqdist_l < sqdist_r:
+            b = c
+            sqdist_b = sqdist_c
+            c = left
+            sqdist_c = sqdist_l
+        else:
+            a = c
+            sqdist_a = sqdist_c
+            c = right
+            sqdist_c = sqdist_r
+
+    raise OverflowError("index_closest_to_point reached unreachable statement")
+
+
+"""
+    get_lerp_time_unclamped(A::VecE2, B::VecE2, Q::VecE2)
+Get the interpolation scalar t for the point on the line AB closest to Q
+This point is P = A + (B-A)*t
+"""
+
+
+def get_lerp_time_unclamped_1(A: VecE2.VecE2, B: VecE2.VecE2, Q: VecE2.VecE2):
+
+    a = Q - A
+    b = B - A
+    c = VecE2.proj(a, b, VecE2.VecE2)
+
+    if b.x != 0.0:
+        t = c.x / b.x
+    elif b.y != 0.0:
+        t = c.y / b.y
+    else:
+        t = 0.0 # no lerping to be done
+
+    return t
+
+
+def get_lerp_time_unclamped_2(A: CurvePt, B: CurvePt, Q: VecSE2.VecSE2):
+    return get_lerp_time_unclamped_1(A.pos.convert(), B.pos.convert(), Q.convert())
+
+
+def get_lerp_time_unclamped_3(A: VecSE2.VecSE2, B: VecSE2.VecSE2, Q: VecSE2.VecSE2):
+    return get_lerp_time_unclamped_1(A.convert(), B.convert(), Q.convert())
+
+
+def clamp(a, low, high):
+    return min(high, max(low, a))
+
+
+def get_lerp_time_1(A: VecE2.VecE2, B: VecE2.VecE2, Q: VecE2.VecE2):
+    return clamp(get_lerp_time_unclamped_1(A, B, Q), 0.0, 1.0)
+
+
+def get_lerp_time_2(A: CurvePt, B: CurvePt, Q: VecSE2.VecSE2):
+    return get_lerp_time_1(A.pos.convert(), B.pos.convert, Q.convert())
+
+
+def get_curve_projection(posG: VecSE2.VecSE2, footpoint: VecSE2.VecSE2, ind: CurveIndex):
+    F = geom.inertial2body(posG, footpoint)
+    return CurveProjection(ind, F.y, F.θ)
+
+
 def proj(posG: VecSE2.VecSE2, curve: list):  # TODO: adjust list index
     ind = index_closest_to_point(curve, posG)
     curveind = CurveIndex(0, None)
     footpoint = VecSE2(None, None, None)
     if 1 < ind < len(curve):
-        t_lo = get_lerp_time(curve[ind - 1], curve[ind], posG)
-        t_hi = get_lerp_time(curve[ind], curve[ind + 1], posG)
+        t_lo = get_lerp_time_2(curve[ind - 1], curve[ind], posG)
+        t_hi = get_lerp_time_2(curve[ind], curve[ind + 1], posG)
 
-        p_lo = lerp(curve[ind - 1].pos, curve[ind].pos, t_lo)
-        p_hi = lerp(curve[ind].pos, curve[ind + 1].pos, t_hi)
+        p_lo = VecSE2.lerp(curve[ind - 1].pos, curve[ind].pos, t_lo)
+        p_hi = VecSE2.lerp(curve[ind].pos, curve[ind + 1].pos, t_hi)
 
-        d_lo = norm(VecE2(p_lo - posG))
-        d_hi = norm(VecE2(p_hi - posG))
+        d_lo = VecE2.norm(VecE2.VecE2(p_lo - posG))
+        d_hi = VecE2.norm(VecE2.VecE2(p_hi - posG))
         if d_lo < d_hi:
             footpoint = p_lo
             curveind = CurveIndex(ind - 1, t_lo)
@@ -57,12 +156,12 @@ def proj(posG: VecSE2.VecSE2, curve: list):  # TODO: adjust list index
             footpoint = p_hi
             curveind = CurveIndex(ind, t_hi)
     elif ind == 1:
-        t = get_lerp_time(curve[1], curve[2], posG)
+        t = get_lerp_time_2(curve[1], curve[2], posG)
         footpoint = lerp(curve[1].pos, curve[2].pos, t)
         curveind = CurveIndex(ind, t)
     else:  # ind == length(curve)
-        t = get_lerp_time(curve[end - 1], curve[end], posG)
-        footpoint = lerp(curve[end - 1].pos, curve[end].pos, t)
+        t = get_lerp_time_2(curve[-2], curve[-1], posG)
+        footpoint = lerp(curve[-2].pos, curve[-1].pos, t)
         curveind = CurveIndex(ind - 1, t)
 
     return get_curve_projection(posG, footpoint, curveind)

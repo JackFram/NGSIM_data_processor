@@ -27,12 +27,18 @@ class VecSE2:
     def rotr90(self):
         return VecSE2(self.x, self.y, self.theta - 0.5*math.pi)
 
-    def convert(self, t: type):
+    def convert(self, t: type = VecE2):
         if t == VecE2:
             return VecE2(self.x, self.y)
 
     def mod2pi(self):
         return VecSE2(self.x, self.y, self.theta % (2*math.pi))
+
+    def __add__(self, other):
+        return VecSE2(self.x + other.x, self.y + other.y, self.theta + other.theta)
+
+    def __sub__(self, other):
+        return VecSE2(self.x - other.x, self.y - other.y, self.theta - other.theta)
 
     def __radd__(self, other: VecE2):
         return VecSE2(self.x+other.x, self.y+other.y, self.theta)

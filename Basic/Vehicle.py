@@ -1,5 +1,5 @@
 from Vec import VecSE2
-from Roadway import roadway
+from Roadway import roadway, utils
 
 """
 Frenet
@@ -12,7 +12,13 @@ t: lane offset, positive is to left. zero point is the centerline of the lane.
 
 
 class Frenet:
-    def __init__(self, roadind: roadway.RoadIndex, s: float, t: float, phi: float):
+    def __init__(self, posG: VecSE2.VecSE2, roadWay: roadway.Roadway):
+        # roadind: roadway.RoadIndex, s: float, t: float, phi: float
+        roadproj = roadway.proj_2(posG, roadWay)
+        roadind = roadway.RoadIndex(roadproj.curveproj.ind, roadproj.tag)
+        s = roadWay.get_by_roadindex(roadind).s
+        t = roadproj.curveproj.t
+        phi = utils.mod2pi2(roadproj.curveproj.phi)
         self.roadind = roadind
         self.s = s
         self.t = t
@@ -42,8 +48,8 @@ NULL_VEHICLEDEF = VehicleDef(AgentClass.CAR, None, None)
 
 
 class VehicleState:
-    def __init__(self, posG: VecSE2.VecSE2, posF: Frenet, v: float):
+    def __init__(self, posG: VecSE2.VecSE2, roadWay: roadway.Roadway, v: float):
         self.posG = posG
-        self.posF = posF
+        self.posF = Frenet(posG, roadWay)
         self.v = v
 

@@ -1,4 +1,5 @@
 import os
+from Roadway import roadway
 DIR, filename = os.path.split(os.path.abspath(__file__))
 
 FLOATING_POINT_REGEX = r'[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?'
@@ -13,8 +14,11 @@ NGSIM_TRAJDATA_PATHS = [
                         os.path.join(DIR, "../data/i80_trajectories-0515-0530.txt"),
                        ]
 
-ROADWAY_80 = open(io->read(io, MIME"text/plain"(), Roadway), os.path.join(DIR, "../data/ngsim_80.txt"), "r")
-ROADWAY_101 = open(io->read(io, MIME"text/plain"(), Roadway), os.path.join(DIR, "../data/ngsim_101.txt"), "r")
+fp_80 = open(os.path.join(DIR, "../data/ngsim_80.txt"), "r")
+fp_101 = open(os.path.join(DIR, "../data/ngsim_101.txt"), "r")
+
+ROADWAY_80 = roadway.read_roadway(fp_80)
+ROADWAY_101 = roadway.read_roadway(fp_101)
 
 TRAJDATA_PATHS = [os.path.join( DIR, "../data/trajdata_i101_trajectories-0750am-0805am.txt"),
                 os.path.join( DIR, "../data/trajdata_i101_trajectories-0805am-0820am.txt"),
