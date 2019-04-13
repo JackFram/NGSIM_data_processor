@@ -29,5 +29,33 @@ class ListRecord:
         self.states = states
         self.defs = defs
 
+    def write(self, fp):
+        fp.write("ListRecord{%s, %s, %s}(%d frames)" % ('NGSIM_TIMESTEP', 'Array{RecordFrame}', 'Array{RecordState{VehicleState, Int}}\n', len(self.frames)))
+        fp.write("%.16e\n" % self.timestep)
+
+        # defs
+        fp.write(str(len(self.defs)))
+        for id in self.defs:
+            id.write(fp)
+            fp.write("\n")
+            self.defs[id].write(fp)
+            fp.write("\n")
+
+        # ids & states
+        fp.write(str(len(self.states)))
+        for recstate in self.states:
+            recstate.id.write(fp)
+            fp.write("\n")
+            recstate.state.write(fp)
+            fp.write("\n")
+
+
+        # frames
+        fp.write(str(len(self.frames)))
+        for recframe in self.frames:
+            recframe.write(fp)
+        
+
+
 
 

@@ -198,9 +198,9 @@ def convert_raw_ngsim_to_trajdatas():
         open(io->write(io, MIME"text/plain"(), trajdata), outpath, "w")
 
 
-def load_trajdata(filepath: str):
-    td = open(io->read(io, MIME"text/plain"(), Trajdata), filepath, "r")
-    return td
+# def load_trajdata(filepath: str):
+#     td = open(io->read(io, MIME"text/plain"(), Trajdata), filepath, "r")
+#     return td
 
 
 
