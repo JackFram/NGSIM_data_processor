@@ -1,5 +1,6 @@
 from Basic import Vehicle
 
+
 class RecordFrame:
     def __init__(self, lo: int, hi: int):
         self.lo = lo
@@ -7,6 +8,9 @@ class RecordFrame:
 
     def __len__(self):
         return self.hi - self.lo + 1
+
+    def write(self, fp):
+        fp.write("%d %d" % (self.lo, self.hi))
 
 
 class RecordState:
@@ -36,7 +40,7 @@ class ListRecord:
         # defs
         fp.write(str(len(self.defs)))
         for id in self.defs:
-            id.write(fp)
+            fp.write(str(id))
             fp.write("\n")
             self.defs[id].write(fp)
             fp.write("\n")
@@ -44,17 +48,16 @@ class ListRecord:
         # ids & states
         fp.write(str(len(self.states)))
         for recstate in self.states:
-            recstate.id.write(fp)
+            fp.write(str(recstate.id))
             fp.write("\n")
             recstate.state.write(fp)
             fp.write("\n")
-
 
         # frames
         fp.write(str(len(self.frames)))
         for recframe in self.frames:
             recframe.write(fp)
-        
+
 
 
 

@@ -43,6 +43,9 @@ class VehicleDef:
         self.length_ = length_
         self.width_ = width_
 
+    def write(self, fp):
+        fp.write("%d %.16e %.16e" % (self.class_, self.length_, self.width_))
+
 
 NULL_VEHICLEDEF = VehicleDef(AgentClass.CAR, None, None)
 
@@ -52,4 +55,11 @@ class VehicleState:
         self.posG = posG
         self.posF = Frenet(posG, roadWay)
         self.v = v
+
+    def write(self, fp):
+        fp.write("%.16e %.16e %.16e" % (self.posG.x, self.posG.y, self.posG.theta))
+        fp.write(" %d %.16e %d %d" % (self.posF.roadind.ind.i, self.posF.roadind.ind.t,
+                                      self.posF.roadind.tag.segment, self.posF.roadind.tag.lane))
+        fp.write(" %.16e %.16e %.16e" % (self.posF.s, self.posF.t, self.posF.phi))
+        fp.write(" %.16e" % self.v)
 
