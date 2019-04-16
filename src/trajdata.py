@@ -92,8 +92,8 @@ def filter_trajectory(ftr: FilterTrajectoryResult, v: trajectory_smoothing.Vehic
         # strong result
         ftr.x_arr[i] = mu[0]
         ftr.y_arr[i] = mu[1]
-        ftr.theta_arr[i] = mu[2]
-        ftr.v_arr[i] = mu[3]
+        ftr.theta_arr.append(mu[2])
+        ftr.v_arr[i].append(mu[3])
 
     return ftr
 
@@ -195,7 +195,9 @@ def convert_raw_ngsim_to_trajdatas():
         tdraw = load_ngsim_trajdata(filepath)
         trajdata = convert(tdraw, roadway)
         outpath = os.path.join(DIR, "../data/trajdata_" + filename)
-        open(io->write(io, MIME"text/plain"(), trajdata), outpath, "w")
+        fp = open(outpath, "w")
+        trajdata.write(fp)
+        fp.close()
 
 
 # def load_trajdata(filepath: str):

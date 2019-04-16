@@ -192,8 +192,10 @@ def EKF(v: VehicleSystem, mu: list, Cov, u: list, o: list):
     V = get_transform_control_noise_to_state_space(v, u, list(mu_bar))
     Cov_bar = np.matmul(np.matmul(G, Cov), np.transpose(G)) + R + np.matmul(np.matmul(V, M), np.transpose(V))
     H = compute_observation_jacobian(v, list(mu_bar))
-    K = np.matmul(Cov_bar, np.transpose(H)) / (np.matmul(np.matmul(H, Cov_bar), np.transpose(H))
-                                               + get_observation_noise_covariance(v))
+    A = np.matmul(Cov_bar, np.transpose(H))
+    B = (np.matmul(np.matmul(H, Cov_bar), np.transpose(H)) + get_observation_noise_covariance(v))
+
+    K = np.linalg.lstsq(B.transpose(), A.transpose())[0].transpose()
     mu_next = mu_bar + np.matmul(K, (o - observe(v, list(mu_bar))))
     Cov_next = Cov_bar - np.matmul(K, np.matmul(H, Cov_bar))
 

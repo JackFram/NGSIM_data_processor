@@ -17,7 +17,7 @@ def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))
 
 
-def inertial2body(point: VecSE2.VecSE2, reference: VecSE2.VecSE2):
+def inertial2body(point, reference):
 
     '''
     Convert a point in an inertial cartesian coordinate frame

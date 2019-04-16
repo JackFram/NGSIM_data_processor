@@ -1,4 +1,4 @@
-from NGSIM_data_processor.Vec import VecSE2
+from Vec import VecSE2
 from Vec import VecE2
 from Vec.geom import geom
 

@@ -51,6 +51,7 @@ class LaneConnection:
 
 def parse_lane_connection(line: str):
     cleanedline = re.sub(r"(\(|\))", "", line)
+    print(cleanedline)
     tokens = cleanedline.split()
     assert tokens[0] == "D" or tokens[0] == "U"
     downstream = (tokens[0] == "D")
@@ -81,7 +82,7 @@ class Lane:
         if prev != NULL_ROADINDEX:
             self.entrances.insert(0, LaneConnection(False, CurvePt.CURVEINDEX_START, prev))
 
-    def get_by_ind_roadway(self, ind: CurvePt.CurveIndex, roadway: Roadway):
+    def get_by_ind_roadway(self, ind: CurvePt.CurveIndex, roadway):
         if ind.i == 0:
             pt_lo = prev_lane_point(self, roadway)
             pt_hi = self.curve[0]
@@ -149,10 +150,11 @@ def read_roadway(fp):
         line_index += 1
         seg = RoadSegment(segid, [])
         for i_lane in range(nlanes):
-            assert i_lane == int(lines[line_index].strip())
+            assert i_lane + 1 == int(lines[line_index].strip())
             line_index += 1
             tag = LaneTag(segid, i_lane)
             width = float(lines[line_index].strip())
+            line_index += 1
             tokens = (lines[line_index].strip()).split()
             line_index += 1
             speed_limit = SpeedLimit(float(tokens[0]), float(tokens[1]))
