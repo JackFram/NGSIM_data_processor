@@ -93,7 +93,7 @@ def filter_trajectory(ftr: FilterTrajectoryResult, v: trajectory_smoothing.Vehic
         ftr.x_arr[i] = mu[0]
         ftr.y_arr[i] = mu[1]
         ftr.theta_arr.append(mu[2])
-        ftr.v_arr[i].append(mu[3])
+        ftr.v_arr.append(mu[3])
 
     return ftr
 

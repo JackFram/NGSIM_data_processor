@@ -26,10 +26,10 @@ class CurveIndex:
 
 
 def curveindex_end(curve: list):
-    return CurveIndex(len(curve)-1, 1.0)
+    return CurveIndex(len(curve)-2, 1.0)
 
 
-CURVEINDEX_START = CurveIndex(1, 0.0)
+CURVEINDEX_START = CurveIndex(0, 0.0)
 
 
 class CurveProjection:
@@ -141,28 +141,28 @@ def proj(posG: VecSE2.VecSE2, curve: list):  # TODO: adjust list index
     curveind = CurveIndex(0, None)
     footpoint = VecSE2(None, None, None)
     if 1 < ind < len(curve):
-        t_lo = get_lerp_time_2(curve[ind - 1], curve[ind], posG)
-        t_hi = get_lerp_time_2(curve[ind], curve[ind + 1], posG)
+        t_lo = get_lerp_time_2(curve[ind - 2], curve[ind - 1], posG)
+        t_hi = get_lerp_time_2(curve[ind - 1], curve[ind], posG)
 
-        p_lo = VecSE2.lerp(curve[ind - 1].pos, curve[ind].pos, t_lo)
-        p_hi = VecSE2.lerp(curve[ind].pos, curve[ind + 1].pos, t_hi)
+        p_lo = VecSE2.lerp(curve[ind - 2].pos, curve[ind - 1].pos, t_lo)
+        p_hi = VecSE2.lerp(curve[ind - 1].pos, curve[ind].pos, t_hi)
 
         d_lo = VecE2.norm(VecE2.VecE2(p_lo - posG))
         d_hi = VecE2.norm(VecE2.VecE2(p_hi - posG))
         if d_lo < d_hi:
             footpoint = p_lo
-            curveind = CurveIndex(ind - 1, t_lo)
+            curveind = CurveIndex(ind - 2, t_lo)
         else:
             footpoint = p_hi
-            curveind = CurveIndex(ind, t_hi)
+            curveind = CurveIndex(ind - 1, t_hi)
     elif ind == 1:
-        t = get_lerp_time_2(curve[1], curve[2], posG)
-        footpoint = lerp(curve[1].pos, curve[2].pos, t)
-        curveind = CurveIndex(ind, t)
+        t = get_lerp_time_2(curve[0], curve[1], posG)
+        footpoint = lerp(curve[0].pos, curve[1].pos, t)
+        curveind = CurveIndex(ind - 1, t)
     else:  # ind == length(curve)
         t = get_lerp_time_2(curve[-2], curve[-1], posG)
         footpoint = lerp(curve[-2].pos, curve[-1].pos, t)
-        curveind = CurveIndex(ind - 1, t)
+        curveind = CurveIndex(ind - 2, t)
 
     return get_curve_projection(posG, footpoint, curveind)
 

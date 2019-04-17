@@ -278,7 +278,7 @@ def get_closest_perpendicular_point_between_points(A: VecSE2.VecSE2, B: VecSE2.V
 def proj_1(posG: VecSE2.VecSE2, lane: Lane, roadway: Roadway, move_along_curves: bool = True):
     curveproj = CurvePt.proj(posG, lane.curve)
     rettag = lane.tag
-    if curveproj.ind == CurvePt.CurveIndex(1, 0.0) and has_prev(lane):
+    if curveproj.ind == CurvePt.CurveIndex(0, 0.0) and has_prev(lane):
         pt_lo = prev_lane_point(lane, roadway)
         pt_hi = lane.curve[0]
         t = CurvePt.get_lerp_time_unclamped_2(pt_lo, pt_hi, posG)
@@ -292,7 +292,7 @@ def proj_1(posG: VecSE2.VecSE2, lane: Lane, roadway: Roadway, move_along_curves:
 
             t, footpoint = get_closest_perpendicular_point_between_points(pt_lo.pos, pt_hi.pos, posG)
 
-            ind = CurvePt.CurveIndex(0, t)
+            ind = CurvePt.CurveIndex(-1, t)
             curveproj = CurvePt.get_curve_projection(posG, footpoint, ind)
     elif curveproj.ind == CurvePt.curveindex_end(lane.curve) and has_next(lane):
         pt_lo = lane.curve[-1]
@@ -308,7 +308,7 @@ def proj_1(posG: VecSE2.VecSE2, lane: Lane, roadway: Roadway, move_along_curves:
 
             t, footpoint = get_closest_perpendicular_point_between_points(pt_lo.pos, pt_hi.pos, posG)
 
-            ind = CurvePt.CurveIndex(len(lane.curve), t)
+            ind = CurvePt.CurveIndex(len(lane.curve) - 1, t)
             curveproj = CurvePt.get_curve_projection(posG, footpoint, ind)
     return RoadProjection(curveproj, rettag)
 
@@ -322,7 +322,7 @@ def proj_2(posG: VecSE2.VecSE2, roadway: Roadway):
         for lane in seg.lanes:
             roadproj = proj_1(posG, lane, roadway, move_along_curves=False)  # return RoadProjection
             targetlane = roadway.get_by_tag(roadproj.tag)  # return Lane
-            footpoint = targetlane[roadproj.curveproj.ind, roadway]  # TODO: write a get method
+            footpoint = targetlane.get_by_ind_roadway(roadproj.curveproj.ind, roadway)
             dist2 = VecE2.normsquared(VecE2.VecE2(posG - footpoint.pos))
             if dist2 < best_dist2:
                 best_dist2 = dist2
