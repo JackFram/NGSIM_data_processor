@@ -13,9 +13,7 @@ from Record import record
 from Basic import Vehicle
 from tqdm import tqdm
 
-
-
-NGSIM_TIMESTEP = const.NGSIM_TIMESTEP
+NGSIM_TIMESTEP = 0.1  # [sec]
 SMOOTHING_WIDTH_POS = const.SMOOTHING_WIDTH_POS # [s]
 METERS_PER_FOOT = const.METERS_PER_FOOT
 DIR = const.DIR
@@ -82,6 +80,7 @@ def filter_trajectory(ftr: FilterTrajectoryResult, v: trajectory_smoothing.Vehic
     z = [None, None]
 
     for i in range(1, len(ftr)):
+        print(i, len(ftr))
 
         # pull observation
         z[0] = ftr.x_arr[i]
@@ -104,18 +103,23 @@ def copy(trajdata: ngsim_trajdata.NGSIMTrajdata, ftr: FilterTrajectoryResult):
     N = trajdata.df.loc[dfstart, 'n_frames_in_dataset']
 
     # copy results back to trajdata
-
+    print("start copying: ")
     for i in range(N):
+        print(i, N)
+        print('global_x')
         trajdata.df.loc[dfstart + i, 'global_x'] = ftr.x_arr[i]
-        trajdata.df.loc[dfstart + i, 'global_y'] = ftr.y_arr[i]
-        # trajdata.df[dfstart + i, 'speed'] = ftr.v_arr[i]
-        if i > 0:
-            trajdata.df[dfstart + i, 'speed'] = math.hypot(ftr.x_arr[i] - ftr.x_arr[i-1],
-                                                           ftr.y_arr[i] - ftr.y_arr[i-1]) / NGSIM_TIMESTEP
-        else:
-            trajdata.df[dfstart + i, 'speed'] = math.hypot(ftr.x_arr[i + 1] - ftr.x_arr[i],
-                                                           ftr.y_arr[i + 1] - ftr.y_arr[i]) / NGSIM_TIMESTEP
-        trajdata.df[dfstart + i, 'global_heading'] = ftr.theta_arr[i]
+        print('global_y')
+        #trajdata.df.loc[dfstart + i, 'global_y'] = ftr.y_arr[i]
+        #trajdata.df.loc[dfstart + i, 'speed'] = ftr.v_arr[i]
+        print("speed")
+        # if i > 0:
+        #     trajdata.df[dfstart + i, 'speed'] = math.hypot(ftr.x_arr[i] - ftr.x_arr[i-1],
+        #                                                    ftr.y_arr[i] - ftr.y_arr[i-1]) / NGSIM_TIMESTEP
+        # else:
+        #     trajdata.df[dfstart + i, 'speed'] = math.hypot(ftr.x_arr[i + 1] - ftr.x_arr[i],
+        #                                                    ftr.y_arr[i + 1] - ftr.y_arr[i]) / NGSIM_TIMESTEP
+        print("global_heading")
+        #trajdata.df[dfstart + i, 'global_heading'] = ftr.theta_arr[i]
 
     return trajdata
 
@@ -142,7 +146,8 @@ def load_ngsim_trajdata(filepath: str, autofilter: bool = True):
 
     if autofilter and os.path.splitext(filepath)[1] == ".txt":
         print("filtering:         ")
-        for carid in tqdm(ngsim_trajdata.carid_set(tdraw)):
+        for carid in ngsim_trajdata.carid_set(tdraw):
+            print(carid)
             tdraw = filter_given_trajectory(tdraw, carid)
 
     return tdraw

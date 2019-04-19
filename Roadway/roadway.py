@@ -136,51 +136,51 @@ def read_roadway(fp):
     lines = fp.readlines()
     fp.close()
     line_index = 0
-    if "ROADWAY" in lines[line_index]:
-        line_index += 1
+    if "ROADWAY" in lines[line_index]:  #文件第一行 ROADWAY title
+        line_index += 1  #继续读下一行
 
-    nsegs = int(lines[line_index].strip())
-    line_index += 1
+    nsegs = int(lines[line_index].strip())  # 读Roadway.segments的长度
+    line_index += 1  #继续读下一行
 
     roadway = Roadway()
-    for i_seg in range(nsegs):
-        segid = int(lines[line_index].strip())
-        line_index += 1
-        nlanes = int(lines[line_index].strip())
-        line_index += 1
-        seg = RoadSegment(segid, [])
-        for i_lane in range(nlanes):
-            assert i_lane + 1 == int(lines[line_index].strip())
-            line_index += 1
-            tag = LaneTag(segid, i_lane)
-            width = float(lines[line_index].strip())
-            line_index += 1
+    for i_seg in range(nsegs):  # 循环读每个segments的内容
+        segid = int(lines[line_index].strip())  # parse segments.id
+        line_index += 1  #继续读下一行
+        nlanes = int(lines[line_index].strip())  # 读出Roadway.segments.lanes的长度
+        line_index += 1  #继续读下一行
+        seg = RoadSegment(segid, [])  #
+        for i_lane in range(nlanes):  # 循环读每个lane的内容
+            assert i_lane + 1 == int(lines[line_index].strip())  # 这里是用来确认lane符合顺序且读的方式正确
+            line_index += 1  #继续读下一行
+            tag = LaneTag(segid, i_lane)  # make Roadway.segments.lanes.tag
+            width = float(lines[line_index].strip())  # parse width
+            line_index += 1  #继续读下一行
             tokens = (lines[line_index].strip()).split()
-            line_index += 1
-            speed_limit = SpeedLimit(float(tokens[0]), float(tokens[1]))
+            line_index += 1  #继续读下一行
+            speed_limit = SpeedLimit(float(tokens[0]), float(tokens[1]))  # parse speed limit
             tokens = (lines[line_index].strip()).split()
-            line_index += 1
-            boundary_left = LaneBoundary(tokens[0], tokens[1])
+            line_index += 1  #继续读下一行
+            boundary_left = LaneBoundary(tokens[0], tokens[1])  # parse boundary_left
             tokens = (lines[line_index].strip()).split()
-            line_index += 1
-            boundary_right = LaneBoundary(tokens[0], tokens[1])
+            line_index += 1  #继续读下一行
+            boundary_right = LaneBoundary(tokens[0], tokens[1])  # parse boundary_right
             exits = []
             entrances = []
-            n_conns = int(lines[line_index].strip())
-            line_index += 1
-            for i_conn in range(n_conns):
-                conn = parse_lane_connection(lines[line_index].strip())
-                line_index += 1
+            n_conns = int(lines[line_index].strip())  # 这里应该是Roadway.segments.lanes.exits以及entrances的长度
+            line_index += 1  #继续读下一行
+            for i_conn in range(n_conns):  # 循环parse每个exit以及entrance
+                conn = parse_lane_connection(lines[line_index].strip())  # parse LaneConnection
+                line_index += 1  #继续读下一行
                 if conn.downstream:
-                    exits.append(conn)
+                    exits.append(conn)  # if downstream 就是exit的数据
                 else:
-                    entrances.append(conn)
-            npts = int(lines[line_index].strip())
-            line_index += 1
+                    entrances.append(conn)  # else entrance的数据
+            npts = int(lines[line_index].strip())  # 有多少个curve点————Roadway.segments.lanes.curve的长度
+            line_index += 1  #继续读下一行
             curve = []
-            for i_pt in range(npts):
+            for i_pt in range(npts):  # 循环parse CurvePt
                 line = lines[line_index].strip()
-                line_index += 1
+                line_index += 1  #继续读下一行
                 cleanedline = re.sub(r"(\(|\))", "", line)
                 tokens = cleanedline.split()
                 x = float(tokens[0])
@@ -189,12 +189,12 @@ def read_roadway(fp):
                 s = float(tokens[3])
                 k = float(tokens[4])
                 kd = float(tokens[5])
-                curve.append(CurvePt.CurvePt(VecSE2.VecSE2(x, y, theta), s, k, kd))
+                curve.append(CurvePt.CurvePt(VecSE2.VecSE2(x, y, theta), s, k, kd))  # append CurvePt in Roadway.segments.lanes.curve
             seg.lanes.append(Lane(tag, curve, width=width, speed_limit=speed_limit,
                                      boundary_left=boundary_left,
                                      boundary_right=boundary_right,
-                                     entrances=entrances, exits=exits))
-        roadway.segments.append(seg)
+                                     entrances=entrances, exits=exits)) # append lane in Roadway.segments.lanes
+        roadway.segments.append(seg)  # append segs in Roadway.segments
     return roadway
 
 
