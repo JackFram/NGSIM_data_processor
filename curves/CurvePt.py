@@ -24,9 +24,19 @@ class CurveIndex:
         self.i = i
         self.t = t
 
+    def __eq__(self, other):
+        return self.t == other.t and self.i == other.i
+
+    def __ne__(self, other):
+        return self.t != other.t or self.i != other.i
+
 
 def curveindex_end(curve: list):
     return CurveIndex(len(curve)-2, 1.0)
+
+
+def get_curve_list_by_index(curve: list, ind: CurveIndex):
+    return lerp(curve[ind.i], curve[ind.i+1], ind.t)
 
 
 CURVEINDEX_START = CurveIndex(0, 0.0)
@@ -57,16 +67,16 @@ def index_closest_to_point(curve: list, target: VecSE2.VecSE2):  # curve: list(C
 
     while True:
         if b == a:
-            return a
+            return a - 1
         elif b == a + 1:
-            return  b if sqdist_b < sqdist_a else a
+            return (b - 1) if sqdist_b < sqdist_a else (a - 1)
         elif c == a + 1 and c == b - 1:
             if sqdist_a < sqdist_b and sqdist_a < sqdist_c:
-                return a
+                return a - 1
             elif sqdist_b < sqdist_a and sqdist_b < sqdist_c:
-                return b
+                return b - 1
             else:
-                return c
+                return c - 1
 
         left = div(a+c, 2)
         sqdist_l = VecE2.normsquared(VecE2.VecE2(curve[left].pos - target))
@@ -138,31 +148,31 @@ def get_curve_projection(posG: VecSE2.VecSE2, footpoint: VecSE2.VecSE2, ind: Cur
 
 def proj(posG: VecSE2.VecSE2, curve: list):  # TODO: adjust list index
     ind = index_closest_to_point(curve, posG)
-    curveind = CurveIndex(0, None)
+    curveind = CurveIndex(-1, None)
     footpoint = VecSE2(None, None, None)
-    if 1 < ind < len(curve):
-        t_lo = get_lerp_time_2(curve[ind - 2], curve[ind - 1], posG)
-        t_hi = get_lerp_time_2(curve[ind - 1], curve[ind], posG)
+    if 0 < ind < len(curve) - 1:
+        t_lo = get_lerp_time_2(curve[ind - 1], curve[ind], posG)
+        t_hi = get_lerp_time_2(curve[ind], curve[ind + 1], posG)
 
-        p_lo = VecSE2.lerp(curve[ind - 2].pos, curve[ind - 1].pos, t_lo)
-        p_hi = VecSE2.lerp(curve[ind - 1].pos, curve[ind].pos, t_hi)
+        p_lo = VecSE2.lerp(curve[ind - 1].pos, curve[ind].pos, t_lo)
+        p_hi = VecSE2.lerp(curve[ind].pos, curve[ind + 1].pos, t_hi)
 
         d_lo = VecE2.norm(VecE2.VecE2(p_lo - posG))
         d_hi = VecE2.norm(VecE2.VecE2(p_hi - posG))
         if d_lo < d_hi:
             footpoint = p_lo
-            curveind = CurveIndex(ind - 2, t_lo)
+            curveind = CurveIndex(ind - 1, t_lo)
         else:
             footpoint = p_hi
-            curveind = CurveIndex(ind - 1, t_hi)
-    elif ind == 1:
+            curveind = CurveIndex(ind, t_hi)
+    elif ind == 0:
         t = get_lerp_time_2(curve[0], curve[1], posG)
         footpoint = lerp(curve[0].pos, curve[1].pos, t)
-        curveind = CurveIndex(ind - 1, t)
+        curveind = CurveIndex(ind, t)
     else:  # ind == length(curve)
         t = get_lerp_time_2(curve[-2], curve[-1], posG)
         footpoint = lerp(curve[-2].pos, curve[-1].pos, t)
-        curveind = CurveIndex(ind - 2, t)
+        curveind = CurveIndex(ind - 1, t)
 
     return get_curve_projection(posG, footpoint, curveind)
 

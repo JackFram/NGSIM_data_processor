@@ -68,13 +68,13 @@ class Lane:
                  boundary_left: LaneBoundary = NULL_BOUNDARY, boundary_right: LaneBoundary = NULL_BOUNDARY, exits: list = [], entrances: list = [],
                  next: RoadIndex = NULL_ROADINDEX, prev: RoadIndex = NULL_ROADINDEX):
         self.tag = tag
-        self.curve = curve
+        self.curve = curve  # Array of Curve
         self.width = width
         self.speed_limit = speed_limit
         self.boundary_left = boundary_left
         self.boundary_right = boundary_right
-        self.exits = exits
-        self.entrances = entrances
+        self.exits = exits  # Array of LaneConnection
+        self.entrances = entrances  # Array of LaneConnection
 
         if next != NULL_ROADINDEX:
             self.exits.insert(0, LaneConnection(True, CurvePt.curveindex_end(self.curve), next))
@@ -83,14 +83,14 @@ class Lane:
             self.entrances.insert(0, LaneConnection(False, CurvePt.CURVEINDEX_START, prev))
 
     def get_by_ind_roadway(self, ind: CurvePt.CurveIndex, roadway):
-        if ind.i == 0:
+        if ind.i == -1:
             pt_lo = prev_lane_point(self, roadway)
             pt_hi = self.curve[0]
             s_gap = VecE2.norm(VecE2.VecE2(pt_hi.pos - pt_lo.pos))
             pt_lo = CurvePt.CurvePt(pt_lo.pos, -s_gap, pt_lo.k, pt_lo.kd)
             return CurvePt.lerp(pt_lo, pt_hi, ind.t)
-        elif ind.i < len(self.curve):
-            return CurvePt.lerp(self.curve[ind.i - 1], self.curve[ind.i], ind.t)
+        elif ind.i < len(self.curve) - 1:
+            return CurvePt.get_curve_list_by_index(self.curve, ind)
         else:
             pt_hi = next_lane_point(self, roadway)
             pt_lo = self.curve[-1]
@@ -109,13 +109,13 @@ def has_prev(lane: Lane):
 
 class RoadSegment:
     def __init__(self, id: int, lanes: list):
-        self.id = id
-        self.lanes = lanes
+        self.id = id  # integer
+        self.lanes = lanes  # Array of Lane
 
 
 class Roadway:
     def __init__(self, segments: list = []):
-        self.segments = segments
+        self.segments = segments  # Array of RoadSegment
 
     def get_by_tag(self, tag: LaneTag):
         seg = self.get_by_id(tag.segment)

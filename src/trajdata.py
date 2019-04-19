@@ -11,6 +11,7 @@ from src import const
 from Roadway import roadway
 from Record import record
 from Basic import Vehicle
+from tqdm import tqdm
 
 
 
@@ -141,7 +142,7 @@ def load_ngsim_trajdata(filepath: str, autofilter: bool = True):
 
     if autofilter and os.path.splitext(filepath)[1] == ".txt":
         print("filtering:         ")
-        for carid in ngsim_trajdata.carid_set(tdraw):
+        for carid in tqdm(ngsim_trajdata.carid_set(tdraw)):
             tdraw = filter_given_trajectory(tdraw, carid)
 
     return tdraw
@@ -153,18 +154,22 @@ def convert(tdraw: ngsim_trajdata.NGSIMTrajdata, roadway: roadway.Roadway):
     states = []
     frames = []
 
-    for id, dfind in tdraw.car2start:
+    print("convert: Vehicle definition")
+
+    for id, dfind in tqdm(tdraw.car2start):
         vehdefs[id] = Vehicle.VehicleDef(df.loc[dfind, 'class'],
                                         df.loc[dfind, 'length'] * METERS_PER_FOOT,
                                         df.loc[dfind, 'width'] * METERS_PER_FOOT)
 
-    state_ind = 0
-    for frame in range(tdraw.nframes):
+    state_ind = -1
+    print("convert: frames and states")
+    for frame in tqdm(range(1, tdraw.nframes + 1)):
 
         frame_lo = state_ind + 1
 
         for id in ngsim_trajdata.carsinframe(tdraw, frame):
             dfind = ngsim_trajdata.car_df_index(tdraw, id, frame)
+            assert dfind != -1
 
             posG = VecSE2.VecSE2(df.loc[dfind, 'global_x'] * METERS_PER_FOOT,
                                  df.loc[dfind, 'global_y'] * METERS_PER_FOOT,
@@ -192,7 +197,12 @@ def convert_raw_ngsim_to_trajdatas():
         print("converting " + filename)
 
         roadway = get_corresponding_roadway(filename)
+        print("finish loading roadway.")
+        print("Start loading NGSIM trajectory data.")
         tdraw = load_ngsim_trajdata(filepath)
+        print("finish loading NGSIM trajectory data.")
+        print("Start converting.")
+        # no problems until here
         trajdata = convert(tdraw, roadway)
         outpath = os.path.join(DIR, "../data/trajdata_" + filename)
         fp = open(outpath, "w")

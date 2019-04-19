@@ -102,7 +102,7 @@ def read_roadway(input_params: RoadwayInputParams):
     boundaries = read_boundaries(input_params.filepath_boundaries)
     centerlines = read_centerlines(input_params.filepath_centerlines)
     name = os.path.splitext(os.path.split('../data/centerlines80.txt')[1])[0]
-    return NGSIMRoadway(name, boundaries, centerlines)  # need to change into a list
+    return NGSIMRoadway(name, boundaries, centerlines)  # TODO: need to change into a list
 
 
 def write_lwpolyline(pts: list, handle_int: int, is_closed: bool = False):

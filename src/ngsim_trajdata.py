@@ -57,7 +57,7 @@ def car_df_index(trajdata: NGSIMTrajdata, carid: int, frame: int):
     lo = trajdata.car2start[carid]
     framestart = df.loc[lo, 'frame']
 
-    retval = 0
+    retval = -1
 
     if framestart == frame:
         retval = lo
@@ -65,7 +65,7 @@ def car_df_index(trajdata: NGSIMTrajdata, carid: int, frame: int):
         retval = frame - framestart + lo
         n_frames = df.loc[lo, 'n_frames_in_dataset']
         if retval > lo + n_frames:
-            retval = 0
+            retval = -1
 
     return retval
 
