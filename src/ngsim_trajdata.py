@@ -4,6 +4,7 @@
 import pandas as pd
 import numpy as np
 import os
+from tqdm import tqdm
 
 
 class NGSIMTrajdata:
@@ -17,10 +18,10 @@ class NGSIMTrajdata:
                      'speed', 'acc', 'lane', 'carind_front', 'carind_rear',
                      'dist_headway', 'time_headway', 'global_heading']
         self.df.columns = col_names
-        for (dfind, carid) in enumerate(self.df['id']):
+        for (dfind, carid) in tqdm(enumerate(self.df['id'])):
             if carid not in self.car2start:
                 self.car2start[carid] = dfind
-            frame = int(self.df.loc[dfind, ['frame']])
+            frame = int(self.df.loc[dfind, 'frame'])
             if frame not in self.frame2cars:
                 self.frame2cars[frame] = [carid]
             else:
@@ -30,6 +31,8 @@ class NGSIMTrajdata:
 
 
 def carsinframe(trajdata: NGSIMTrajdata, frame: int):
+    if frame not in trajdata.frame2cars:
+        return []
     return trajdata.frame2cars[frame]
 
 

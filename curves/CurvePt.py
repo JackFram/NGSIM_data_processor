@@ -61,9 +61,13 @@ def index_closest_to_point(curve: list, target: VecSE2.VecSE2):  # curve: list(C
 
     assert(len(curve) >= b)
 
-    sqdist_a = VecE2.normsquared(VecE2.VecE2(curve[a].pos - target))
-    sqdist_b = VecE2.normsquared(VecE2.VecE2(curve[b].pos - target))
-    sqdist_c = VecE2.normsquared(VecE2.VecE2(curve[c].pos - target))
+    sqdist_a = curve[a - 1].pos - target
+    sqdist_b = curve[b - 1].pos - target
+    sqdist_c = curve[c - 1].pos - target
+
+    sqdist_a = VecE2.normsquared(VecE2.VecE2(sqdist_a.x, sqdist_a.y))
+    sqdist_b = VecE2.normsquared(VecE2.VecE2(sqdist_b.x, sqdist_b.y))
+    sqdist_c = VecE2.normsquared(VecE2.VecE2(sqdist_c.x, sqdist_c.y))
 
     while True:
         if b == a:
@@ -79,10 +83,12 @@ def index_closest_to_point(curve: list, target: VecSE2.VecSE2):  # curve: list(C
                 return c - 1
 
         left = div(a+c, 2)
-        sqdist_l = VecE2.normsquared(VecE2.VecE2(curve[left].pos - target))
+        sqdist_l = curve[left - 1].pos - target
+        sqdist_l = VecE2.normsquared(VecE2.VecE2(sqdist_l.x, sqdist_l.y))
 
         right = div(c+b, 2)
-        sqdist_r = VecE2.normsquared(VecE2.VecE2(curve[right].pos - target))
+        sqdist_r = curve[right - 1].pos - target
+        sqdist_r = VecE2.normsquared(VecE2.VecE2(sqdist_r.x, sqdist_r.y))
 
         if sqdist_l < sqdist_r:
             b = c
@@ -148,8 +154,8 @@ def get_curve_projection(posG: VecSE2.VecSE2, footpoint: VecSE2.VecSE2, ind: Cur
 
 def proj(posG: VecSE2.VecSE2, curve: list):  # TODO: adjust list index
     ind = index_closest_to_point(curve, posG)
-    curveind = CurveIndex(-1, None)
-    footpoint = VecSE2(None, None, None)
+    curveind = CurveIndex(-1, 0)
+    footpoint = VecSE2.VecSE2(0, 0, 0)
     if 0 < ind < len(curve) - 1:
         t_lo = get_lerp_time_2(curve[ind - 1], curve[ind], posG)
         t_hi = get_lerp_time_2(curve[ind], curve[ind + 1], posG)

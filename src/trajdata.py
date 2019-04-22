@@ -80,7 +80,6 @@ def filter_trajectory(ftr: FilterTrajectoryResult, v: trajectory_smoothing.Vehic
     z = [None, None]
 
     for i in range(1, len(ftr)):
-        print(i, len(ftr))
 
         # pull observation
         z[0] = ftr.x_arr[i]
@@ -105,21 +104,27 @@ def copy(trajdata: ngsim_trajdata.NGSIMTrajdata, ftr: FilterTrajectoryResult):
     # copy results back to trajdata
     print("start copying: ")
     for i in range(N):
-        print(i, N)
-        print('global_x')
+        #print(dfstart, i, N)
+        #print('global_x')
         trajdata.df.loc[dfstart + i, 'global_x'] = ftr.x_arr[i]
-        print('global_y')
-        #trajdata.df.loc[dfstart + i, 'global_y'] = ftr.y_arr[i]
-        #trajdata.df.loc[dfstart + i, 'speed'] = ftr.v_arr[i]
-        print("speed")
-        # if i > 0:
-        #     trajdata.df[dfstart + i, 'speed'] = math.hypot(ftr.x_arr[i] - ftr.x_arr[i-1],
-        #                                                    ftr.y_arr[i] - ftr.y_arr[i-1]) / NGSIM_TIMESTEP
-        # else:
-        #     trajdata.df[dfstart + i, 'speed'] = math.hypot(ftr.x_arr[i + 1] - ftr.x_arr[i],
-        #                                                    ftr.y_arr[i + 1] - ftr.y_arr[i]) / NGSIM_TIMESTEP
-        print("global_heading")
-        #trajdata.df[dfstart + i, 'global_heading'] = ftr.theta_arr[i]
+        #print('global_y')
+        trajdata.df.loc[dfstart + i, 'global_y'] = ftr.y_arr[i]
+        trajdata.df.loc[dfstart + i, 'speed'] = ftr.v_arr[i]
+        #print("speed")
+        if i > 0:
+            a = ftr.x_arr[i]
+            b = ftr.x_arr[i-1]
+            c = ftr.y_arr[i]
+            d = ftr.y_arr[i-1]
+            trajdata.df.loc[dfstart + i, 'speed'] = math.hypot(a-b, c-d) / NGSIM_TIMESTEP
+        else:
+            a = ftr.x_arr[i + 1]
+            b = ftr.x_arr[i]
+            c = ftr.y_arr[i + 1]
+            d = ftr.y_arr[i]
+            trajdata.df.loc[dfstart + i, 'speed'] = math.hypot(a-b, c-d) / NGSIM_TIMESTEP
+        #print("global_heading")
+        trajdata.df.loc[dfstart + i, 'global_heading'] = ftr.theta_arr[i]
 
     return trajdata
 
@@ -140,13 +145,13 @@ def filter_given_trajectory(trajdata: ngsim_trajdata.NGSIMTrajdata, carid: int):
     return trajdata
 
 
-def load_ngsim_trajdata(filepath: str, autofilter: bool = True):
+def load_ngsim_trajdata(filepath: str, autofilter: bool = False):
     print("loading from file: ")
     tdraw = ngsim_trajdata.NGSIMTrajdata(filepath)
 
     if autofilter and os.path.splitext(filepath)[1] == ".txt":
         print("filtering:         ")
-        for carid in ngsim_trajdata.carid_set(tdraw):
+        for carid in tqdm(ngsim_trajdata.carid_set(tdraw)):
             print(carid)
             tdraw = filter_given_trajectory(tdraw, carid)
 
@@ -161,14 +166,14 @@ def convert(tdraw: ngsim_trajdata.NGSIMTrajdata, roadway: roadway.Roadway):
 
     print("convert: Vehicle definition")
 
-    for id, dfind in tqdm(tdraw.car2start):
+    for id, dfind in tdraw.car2start.items():
         vehdefs[id] = Vehicle.VehicleDef(df.loc[dfind, 'class'],
                                         df.loc[dfind, 'length'] * METERS_PER_FOOT,
                                         df.loc[dfind, 'width'] * METERS_PER_FOOT)
 
     state_ind = -1
     print("convert: frames and states")
-    for frame in tqdm(range(1, tdraw.nframes + 1)):
+    for frame in tqdm(range(0, tdraw.nframes + 1)):  # change from 1 to 0
 
         frame_lo = state_ind + 1
 
@@ -181,10 +186,11 @@ def convert(tdraw: ngsim_trajdata.NGSIMTrajdata, roadway: roadway.Roadway):
                                  df.loc[dfind, 'global_heading'])
             speed = df.loc[dfind, 'speed'] * METERS_PER_FOOT
             state_ind += 1
-            states[state_ind] = record.RecordState(Vehicle.VehicleState(posG, roadway, speed), id)
+            print(state_ind)
+            states.append(record.RecordState(Vehicle.VehicleState(posG, roadway, speed), id))
 
         frame_hi = state_ind
-        frames[frame] = record.RecordFrame(frame_lo, frame_hi)
+        frames.append(record.RecordFrame(frame_lo, frame_hi))
 
     return record.ListRecord(NGSIM_TIMESTEP, frames, states, vehdefs)
 
