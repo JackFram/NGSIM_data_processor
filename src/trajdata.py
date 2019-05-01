@@ -186,7 +186,7 @@ def convert(tdraw: ngsim_trajdata.NGSIMTrajdata, roadway: roadway.Roadway):
                                  df.loc[dfind, 'global_heading'])
             speed = df.loc[dfind, 'speed'] * METERS_PER_FOOT
             state_ind += 1
-            print(state_ind)
+            #print(state_ind)
             states.append(record.RecordState(Vehicle.VehicleState(posG, roadway, speed), id))
 
         frame_hi = state_ind
@@ -215,6 +215,7 @@ def convert_raw_ngsim_to_trajdatas():
         print("Start converting.")
         # no problems until here
         trajdata = convert(tdraw, roadway)
+        print("finish converting")
         outpath = os.path.join(DIR, "../data/trajdata_" + filename)
         fp = open(outpath, "w")
         trajdata.write(fp)

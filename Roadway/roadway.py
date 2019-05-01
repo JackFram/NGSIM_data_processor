@@ -119,6 +119,7 @@ class Roadway:
 
     def get_by_tag(self, tag: LaneTag):
         seg = self.get_by_id(tag.segment)
+        #print(seg.id, len(seg.lanes), tag.lane)
         return seg.lanes[tag.lane]
 
     def get_by_id(self, segid: int):
@@ -142,7 +143,7 @@ def read_roadway(fp):
     nsegs = int(lines[line_index].strip())  # 读Roadway.segments的长度
     line_index += 1  #继续读下一行
 
-    roadway = Roadway()
+    roadway = Roadway([])
     for i_seg in range(nsegs):  # 循环读每个segments的内容
         segid = int(lines[line_index].strip())  # parse segments.id
         line_index += 1  #继续读下一行
@@ -153,6 +154,7 @@ def read_roadway(fp):
             assert i_lane + 1 == int(lines[line_index].strip())  # 这里是用来确认lane符合顺序且读的方式正确
             line_index += 1  #继续读下一行
             tag = LaneTag(segid, i_lane)  # make Roadway.segments.lanes.tag
+            #print(segid, nlanes, i_lane)
             width = float(lines[line_index].strip())  # parse width
             line_index += 1  #继续读下一行
             tokens = (lines[line_index].strip()).split()
@@ -195,6 +197,7 @@ def read_roadway(fp):
                                      boundary_right=boundary_right,
                                      entrances=entrances, exits=exits)) # append lane in Roadway.segments.lanes
         roadway.segments.append(seg)  # append segs in Roadway.segments
+        #print(len(roadway.segments))
     return roadway
 
 
@@ -310,6 +313,7 @@ def proj_1(posG: VecSE2.VecSE2, lane: Lane, roadway: Roadway, move_along_curves:
 
             ind = CurvePt.CurveIndex(len(lane.curve) - 1, t)
             curveproj = CurvePt.get_curve_projection(posG, footpoint, ind)
+    #print(rettag.segment, rettag.lane)
     return RoadProjection(curveproj, rettag)
 
 
@@ -323,7 +327,8 @@ def proj_2(posG: VecSE2.VecSE2, roadway: Roadway):
             roadproj = proj_1(posG, lane, roadway, move_along_curves=False)  # return RoadProjection
             targetlane = roadway.get_by_tag(roadproj.tag)  # return Lane
             footpoint = targetlane.get_by_ind_roadway(roadproj.curveproj.ind, roadway)
-            dist2 = VecE2.normsquared(VecE2.VecE2(posG - footpoint.pos))
+            vec = posG - footpoint.pos
+            dist2 = VecE2.normsquared(VecE2.VecE2(vec.x, vec.y))
             if dist2 < best_dist2:
                 best_dist2 = dist2
                 best_proj = roadproj

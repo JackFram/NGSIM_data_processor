@@ -114,6 +114,8 @@ This point is P = A + (B-A)*t
 def get_lerp_time_unclamped_1(A: VecE2.VecE2, B: VecE2.VecE2, Q: VecE2.VecE2):
 
     a = Q - A
+    # A.show()
+    # B.show()
     b = B - A
     c = VecE2.proj(a, b, VecE2.VecE2)
 
@@ -144,12 +146,12 @@ def get_lerp_time_1(A: VecE2.VecE2, B: VecE2.VecE2, Q: VecE2.VecE2):
 
 
 def get_lerp_time_2(A: CurvePt, B: CurvePt, Q: VecSE2.VecSE2):
-    return get_lerp_time_1(A.pos.convert(), B.pos.convert, Q.convert())
+    return get_lerp_time_1(A.pos.convert(), B.pos.convert(), Q.convert())
 
 
 def get_curve_projection(posG: VecSE2.VecSE2, footpoint: VecSE2.VecSE2, ind: CurveIndex):
     F = geom.inertial2body(posG, footpoint)
-    return CurveProjection(ind, F.y, F.θ)
+    return CurveProjection(ind, F.y, F.theta)
 
 
 def proj(posG: VecSE2.VecSE2, curve: list):  # TODO: adjust list index
@@ -163,8 +165,11 @@ def proj(posG: VecSE2.VecSE2, curve: list):  # TODO: adjust list index
         p_lo = VecSE2.lerp(curve[ind - 1].pos, curve[ind].pos, t_lo)
         p_hi = VecSE2.lerp(curve[ind].pos, curve[ind + 1].pos, t_hi)
 
-        d_lo = VecE2.norm(VecE2.VecE2(p_lo - posG))
-        d_hi = VecE2.norm(VecE2.VecE2(p_hi - posG))
+        vec_lo = p_lo - posG
+        vec_hi = p_hi - posG
+
+        d_lo = VecE2.norm(VecE2.VecE2(vec_lo.x, vec_lo.y))
+        d_hi = VecE2.norm(VecE2.VecE2(vec_hi.x, vec_hi.y))
         if d_lo < d_hi:
             footpoint = p_lo
             curveind = CurveIndex(ind - 1, t_lo)
@@ -173,11 +178,11 @@ def proj(posG: VecSE2.VecSE2, curve: list):  # TODO: adjust list index
             curveind = CurveIndex(ind, t_hi)
     elif ind == 0:
         t = get_lerp_time_2(curve[0], curve[1], posG)
-        footpoint = lerp(curve[0].pos, curve[1].pos, t)
+        footpoint = VecSE2.lerp(curve[0].pos, curve[1].pos, t)
         curveind = CurveIndex(ind, t)
     else:  # ind == length(curve)
         t = get_lerp_time_2(curve[-2], curve[-1], posG)
-        footpoint = lerp(curve[-2].pos, curve[-1].pos, t)
+        footpoint = VecSE2.lerp(curve[-2].pos, curve[-1].pos, t)
         curveind = CurveIndex(ind - 1, t)
 
     return get_curve_projection(posG, footpoint, curveind)

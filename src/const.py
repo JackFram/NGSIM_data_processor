@@ -14,11 +14,13 @@ NGSIM_TRAJDATA_PATHS = [
                         os.path.join(DIR, "../data/i80_trajectories-0515-0530.txt"),
                        ]
 
-fp_80 = open(os.path.join(DIR, "../data/ngsim_80.txt"), "r")
-fp_101 = open(os.path.join(DIR, "../data/ngsim_101.txt"), "r")
+with open(os.path.join(DIR, "../data/ngsim_80.txt"), "r") as fp_80:
+    ROADWAY_80 = roadway.read_roadway(fp_80)
+    fp_80.close()
 
-ROADWAY_80 = roadway.read_roadway(fp_80)
-ROADWAY_101 = roadway.read_roadway(fp_101)
+with open(os.path.join(DIR, "../data/ngsim_101.txt"), "r") as fp_101:
+    ROADWAY_101 = roadway.read_roadway(fp_101)
+    fp_101.close()
 
 TRAJDATA_PATHS = [os.path.join( DIR, "../data/trajdata_i101_trajectories-0750am-0805am.txt"),
                 os.path.join( DIR, "../data/trajdata_i101_trajectories-0805am-0820am.txt"),
